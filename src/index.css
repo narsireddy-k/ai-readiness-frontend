@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-cyan: #13b9d6;
+  --color-brand-green: #39b87c;
+  --color-brand-dark: #333132;
+  --color-brand-gray: #4d4d4f;
+}
+
+.bg-brand-gradient {
+  background: linear-gradient(90deg, #13b9d6 0%, #39b87c 100%);
+}
+
+.text-brand-gradient {
+  background: linear-gradient(90deg, #13b9d6 0%, #39b87c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.border-brand-cyan {
+  border-color: #13b9d6;
+}
+
+/* Fade in effect */
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Progress bar animation */
+@keyframes progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+.animate-progress {
+  animation: progress 2s linear infinite;
+}
