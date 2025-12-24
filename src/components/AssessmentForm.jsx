@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { fetchQuestions, submitAssessment, downloadPDF } from "../api/aiReadiness";
 import QuestionCard from "./QuestionCard";
 import ProgressBar from "./ProgressBar";
 import UserDetailsForm from "./UserDetailsForm";
 import AssessmentResult from "./AssessmentResult";
+import { runValidations } from "../utils/validationEngine";
+import WarningModal from "./WarningModal";
+import AssessmentPreview from "./AssessmentPreview";
+
+
 
 export default function AssessmentForm() {
     const [questions, setQuestions] = useState([]);
@@ -15,6 +21,13 @@ export default function AssessmentForm() {
     const [completed, setCompleted] = useState(false);
     const [submissionId, setSubmissionId] = useState(null);
     const [assessmentResult, setAssessmentResult] = useState(null);
+
+    const [activeWarning, setActiveWarning] = useState(null);
+    const [dismissedWarnings, setDismissedWarnings] = useState(new Set());
+
+    const [showPreview, setShowPreview] = useState(false);
+    const [finalWarnings, setFinalWarnings] = useState([]);
+
 
     useEffect(() => {
         loadQuestions();
@@ -37,20 +50,35 @@ export default function AssessmentForm() {
     };
 
     const handleAnswerChange = (questionId, value) => {
-        setAnswers((prev) => ({
-            ...prev,
-            [questionId]: value,
-        }));
+        setAnswers(prev => {
+            const updated = { ...prev, [questionId]: value };
+
+            const warnings = runValidations(updated, questions, questionId);
+
+            const next = warnings.find(
+                w => !dismissedWarnings.has(w.id)
+            );
+
+            if (next) {
+                setActiveWarning(next);
+            }
+
+            return updated;
+        });
     };
 
     const nextSection = () => {
         if (currentSectionIndex < sections.length - 1) {
             window.scrollTo(0, 0);
-            setCurrentSectionIndex((prev) => prev + 1);
+            setCurrentSectionIndex(prev => prev + 1);
         } else {
-            setCompleted(true);
+            const allWarnings = runValidations(answers, questions);
+
+            setFinalWarnings(allWarnings);
+            setShowPreview(true);
         }
     };
+
 
     const prevSection = () => {
         if (currentSectionIndex > 0) {
@@ -102,6 +130,43 @@ export default function AssessmentForm() {
         }
     };
 
+    const conflictedQuestionIds = React.useMemo(() => {
+        const set = new Set();
+
+        [...finalWarnings, ...(activeWarning ? [activeWarning] : [])]
+            .forEach(w => w.questions?.forEach(q => set.add(q)));
+
+        return set;
+    }, [finalWarnings, activeWarning]);
+
+    const navigateToQuestion = (questionId) => {
+        const question = questions.find(q => q.id === questionId);
+        if (!question) return;
+
+        const sectionIndex = sections.indexOf(question.section);
+        if (sectionIndex === -1) return;
+
+        // 1️⃣ Exit preview
+        setShowPreview(false);
+
+        // 2️⃣ Navigate to section
+        setCurrentSectionIndex(sectionIndex);
+
+        // 3️⃣ Scroll to question after render
+        setTimeout(() => {
+            const el = document.getElementById(`question-${questionId}`);
+            if (el) {
+                el.scrollIntoView({ behavior: "smooth", block: "center" });
+                el.classList.add("ring-2", "ring-red-400");
+                setTimeout(() => {
+                    el.classList.remove("ring-2", "ring-red-400");
+                }, 1500);
+            }
+        }, 200);
+    };
+
+
+
     if (loading) return <div className="flex justify-center items-center min-h-[50vh]"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div></div>;
 
     if (submissionId && assessmentResult) {
@@ -114,25 +179,81 @@ export default function AssessmentForm() {
         );
     }
 
+    if (showPreview) {
+        return (
+            <AssessmentPreview
+                questions={questions}
+                answers={answers}
+                warnings={finalWarnings}
+                onEdit={() => {
+                    setShowPreview(false);
+                    setCurrentSectionIndex(sections.length - 1);
+                }}
+                onProceed={() => {
+                    setShowPreview(false);
+                    setCompleted(true);
+                }}
+                onNavigateToQuestion={navigateToQuestion}
+            />
+        );
+    }
+
+
     if (completed) {
-        return <UserDetailsForm onSubmit={handleUserSubmit} loading={submitting} />;
+        return (
+            <div className="relative min-h-screen bg-gray-50">
+                {/* Background report (scrolls normally) */}
+                <div className="relative">
+                    <AssessmentResult
+                        result={assessmentResult || {
+                            overall_score: "—",
+                            category: "Preview",
+                            dimension_scores: {},
+                            feedback_summary:
+                                "Your personalized AI readiness insights will appear here."
+                        }}
+                        onDownload={() => { }}
+                        onRestart={() => { }}
+                    />
+                </div>
+
+                {/* 🔒 Full-page blur + dim layer */}
+                <div className="fixed inset-0 z-40 pointer-events-none">
+                    <div className="absolute inset-0 bg-white/60 backdrop-blur-xs" />
+                </div>
+
+                {/* 🧾 Foreground form */}
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+                    <UserDetailsForm
+                        onSubmit={handleUserSubmit}
+                        loading={submitting}
+                    />
+                </div>
+            </div>
+        );
     }
 
     const currentSection = sections[currentSectionIndex];
     const sectionQuestions = questions.filter((q) => q.section === currentSection);
 
-    // Simple validation to ensure current section is filled
+    const OPTIONAL_QUESTION_IDS = new Set(["USE_CASE"]);
+
     const isSectionComplete = sectionQuestions.every(q => {
+        // ✅ Skip validation for optional questions
+        if (OPTIONAL_QUESTION_IDS.has(q.id)) {
+            return true;
+        }
+
         const val = answers[q.id];
         if (Array.isArray(val)) return val.length > 0;
         return !!val;
     });
 
     return (
-        <div className="max-w-3xl mx-auto px-4 py-8">
+        <div className=" mx-auto px-4 py-8">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-brand-dark mb-2">AI Readiness Assessment</h1>
-                
+
             </div>
 
             <div className="sticky top-0 z-40 bg-white pt-4 pb-4 mb-8 -mx-4 px-4 border-b border-gray-200 shadow-sm">
@@ -140,13 +261,14 @@ export default function AssessmentForm() {
                 <p className="text-brand-gray">Step {currentSectionIndex + 1} of {sections.length}: <span className="font-semibold text-brand-cyan">{currentSection}</span></p>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-6 px-8">
                 {sectionQuestions.map((q) => (
                     <QuestionCard
                         key={q.id}
                         question={q}
                         value={answers[q.id]}
                         onChange={handleAnswerChange}
+                        isConflicted={false}
                     />
                 ))}
             </div>
@@ -173,6 +295,20 @@ export default function AssessmentForm() {
                     {currentSectionIndex === sections.length - 1 ? "Complete Assessment" : "Next Step"}
                 </button>
             </div>
+            <WarningModal
+                open={!!activeWarning}
+                title={activeWarning?.title}
+                message={activeWarning?.message}
+                onReview={() => {
+                    // later: scroll to question
+                    setActiveWarning(null);
+                }}
+                onProceed={() => {
+                    setDismissedWarnings(prev => new Set(prev).add(activeWarning.id));
+                    setActiveWarning(null);
+                }}
+            />
+
         </div>
     );
 }

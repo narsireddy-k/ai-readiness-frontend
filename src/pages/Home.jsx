@@ -1,22 +1,25 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import companyLogo from '../assets/logo.png';
 
 export default function Home() {
     const navigate = useNavigate();
 
     return (
-        <div className="bg-gray-50 flex flex-col justify-center items-center">
+        <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in">
 
-                {/* Brand/Logo Placeholder or decorative element */}
-                <div className="mx-auto h-24 w-24 rounded-full bg-brand-gradient flex items-center justify-center shadow-lg mb-8">
-                    <svg className="h-12 w-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
+                {/* Company Logo */}
+                <div className="mx-auto mb-8">
+                    <img
+                        src={companyLogo}
+                        alt="Company Logo"
+                        className="h-24 w-auto mx-auto drop-shadow-lg"
+                    />
                 </div>
 
                 <h1 className="text-4xl sm:text-5xl font-extrabold text-brand-dark tracking-tight">
-                    Is Your Business <span className="text-brand-gradient bg-clip-text text-transparent pr-2 ">AI Ready ?</span>
+                    Is Your Business <span className="text-brand-gradient bg-clip-text text-transparent pr-2">AI Ready ?</span>
                 </h1>
 
                 <p className="text-xl text-brand-gray max-w-2xl mx-auto leading-relaxed">

@@ -1,7 +1,12 @@
 import React from "react";
 import ReadinessSlider from "./ReadinessSlider";
 
-export default function QuestionCard({ question, value, onChange }) {
+export default function QuestionCard({
+    question,
+    value,
+    onChange,
+    isConflicted
+}) {
     const { id, label, type, options, section } = question;
 
     // Sections that require the interactive slider
@@ -15,7 +20,7 @@ export default function QuestionCard({ question, value, onChange }) {
 
     const shouldUseSlider =
         type === "single_choice" &&
-        options.length === 5 &&
+        options?.length === 5 &&
         sliderSections.includes(section);
 
     const handleChange = (val) => {
@@ -25,15 +30,31 @@ export default function QuestionCard({ question, value, onChange }) {
     const handleMultiChange = (option) => {
         const currentVal = Array.isArray(value) ? value : [];
         if (currentVal.includes(option)) {
-            handleChange(currentVal.filter((item) => item !== option));
+            handleChange(currentVal.filter(item => item !== option));
         } else {
             handleChange([...currentVal, option]);
         }
     };
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-6 animate-fade-in">
-            <h3 className="text-lg font-medium text-brand-dark mb-4">{label}</h3>
+        <div
+            id={id}
+            className={`
+                bg-white p-6 rounded-lg shadow-sm border mb-6 transition-all
+                ${isConflicted
+                    ? "border-red-500 bg-red-50 ring-1 ring-red-300"
+                    : "border-gray-100"}
+            `}
+        >
+            <h3 className="text-lg font-medium text-brand-dark mb-2">
+                {label}
+            </h3>
+
+            {isConflicted && (
+                <div className="mb-4 text-sm font-medium text-red-600">
+                    ⚠ This response may need review for consistency
+                </div>
+            )}
 
             {shouldUseSlider ? (
                 <ReadinessSlider
@@ -45,23 +66,25 @@ export default function QuestionCard({ question, value, onChange }) {
                 <>
                     {type === "single_choice" && (
                         <div className="space-y-3">
-                            {options.map((option) => (
+                            {options.map(option => (
                                 <label
                                     key={option}
-                                    className={`flex items-center p-3 rounded-md border cursor-pointer transition-colors ${value === option
-                                        ? "border-blue-500 bg-blue-50"
-                                        : "border-gray-200 hover:bg-gray-50"
-                                        }`}
+                                    className={`flex items-center p-3 rounded-md border cursor-pointer transition-colors
+                                        ${value === option
+                                            ? "border-blue-500 bg-blue-50"
+                                            : "border-gray-200 hover:bg-gray-50"}
+                                    `}
                                 >
                                     <input
                                         type="radio"
                                         name={id}
-                                        value={option}
                                         checked={value === option}
                                         onChange={() => handleChange(option)}
                                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                                     />
-                                    <span className="ml-3 text-sm text-gray-700">{option}</span>
+                                    <span className="ml-3 text-sm text-gray-700">
+                                        {option}
+                                    </span>
                                 </label>
                             ))}
                         </div>
@@ -71,13 +94,14 @@ export default function QuestionCard({ question, value, onChange }) {
 
             {type === "multi_choice" && (
                 <div className="space-y-3">
-                    {options.map((option) => (
+                    {options.map(option => (
                         <label
                             key={option}
-                            className={`flex items-center p-3 rounded-md border cursor-pointer transition-colors ${Array.isArray(value) && value.includes(option)
-                                ? "border-blue-500 bg-blue-50"
-                                : "border-gray-200 hover:bg-gray-50"
-                                }`}
+                            className={`flex items-center p-3 rounded-md border cursor-pointer transition-colors
+                                ${Array.isArray(value) && value.includes(option)
+                                    ? "border-blue-500 bg-blue-50"
+                                    : "border-gray-200 hover:bg-gray-50"}
+                            `}
                         >
                             <input
                                 type="checkbox"
@@ -85,7 +109,9 @@ export default function QuestionCard({ question, value, onChange }) {
                                 onChange={() => handleMultiChange(option)}
                                 className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
                             />
-                            <span className="ml-3 text-sm text-gray-700">{option}</span>
+                            <span className="ml-3 text-sm text-gray-700">
+                                {option}
+                            </span>
                         </label>
                     ))}
                 </div>

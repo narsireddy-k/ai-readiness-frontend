@@ -29,11 +29,12 @@ export default function UserDetailsForm({ onSubmit, loading }) {
     };
 
     return (
-        <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg animate-fade-in border border-gray-100">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+<div className="flex justify-center items-center h-screen">
+            <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg animate-fade-in border border-gray-100">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">
                 Unlock Your AI Readiness Report
             </h2>
-            <p className="text-gray-600 text-center mb-8">
+            <p className="text-gray-600 text-center mb-4">
                 Please provide your details to receive your personalized assessment report.
             </p>
 
@@ -121,5 +122,6 @@ export default function UserDetailsForm({ onSubmit, loading }) {
                 </button>
             </form>
         </div>
+</div>
     );
 }
