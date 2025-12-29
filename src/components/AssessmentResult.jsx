@@ -1,9 +1,9 @@
 import React from "react";
 import companyLogo from "../assets/logo.png";
+import ScoreDonut from "./ScoreDonut";
 
 export default function AssessmentResult({ result, onDownload, onRestart }) {
 
-    // Guard: wait until result exists
     if (!result) {
         return (
             <div className="max-w-4xl mx-auto px-4 py-16 text-center">
@@ -22,37 +22,26 @@ export default function AssessmentResult({ result, onDownload, onRestart }) {
         id
     } = result;
 
-    // ✅ Normalize score (handles number | string | undefined)
+    // Normalize score
     const rawScore = capped_score ?? overall_score ?? null;
     const parsedScore =
         rawScore !== null && !isNaN(Number(rawScore))
             ? Math.round(Number(rawScore))
             : null;
 
-    // ✅ Color logic based on parsed score
-    const scoreColor =
-        parsedScore >= 80 ? "text-green-600" :
-        parsedScore >= 50 ? "text-blue-600" :
-        "text-orange-500";
-
     const borderColor =
         parsedScore >= 80 ? "border-green-200 bg-green-50" :
-        parsedScore >= 50 ? "border-blue-200 bg-blue-50" :
-        "border-orange-200 bg-orange-50";
+            parsedScore >= 50 ? "border-blue-200 bg-blue-50" :
+                "border-orange-200 bg-orange-50";
 
-    // ✅ Narrative parser
+    // Narrative parser
     const renderNarrative = (text) => {
         if (!text) return null;
 
         const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
 
         return lines.map((line, index) => {
-
-            if (
-                line.endsWith(":") ||
-                line.toLowerCase().includes("assessment") ||
-                line.toLowerCase().includes("recommendation")
-            ) {
+            if (line.endsWith(":")) {
                 return (
                     <h4
                         key={index}
@@ -65,10 +54,7 @@ export default function AssessmentResult({ result, onDownload, onRestart }) {
 
             if (line.startsWith("-") || line.startsWith("•")) {
                 return (
-                    <li
-                        key={index}
-                        className="ml-6 list-disc text-brand-gray mb-1"
-                    >
+                    <li key={index} className="ml-6 list-disc text-brand-gray mb-1">
                         {line.replace(/^[-•]\s*/, "")}
                     </li>
                 );
@@ -76,10 +62,7 @@ export default function AssessmentResult({ result, onDownload, onRestart }) {
 
             if (/^\d+\./.test(line)) {
                 return (
-                    <li
-                        key={index}
-                        className="ml-6 list-decimal text-brand-gray mb-1"
-                    >
+                    <li key={index} className="ml-6 list-decimal text-brand-gray mb-1">
                         {line.replace(/^\d+\.\s*/, "")}
                     </li>
                 );
@@ -102,9 +85,8 @@ export default function AssessmentResult({ result, onDownload, onRestart }) {
                     <img
                         src={companyLogo}
                         alt="Company Logo"
-                        className="h-12 w-auto flex-shrink-0"
+                        className="h-12 w-auto"
                     />
-
                     <div className="text-center sm:text-left">
                         <h2 className="text-3xl font-bold text-brand-dark mb-1">
                             Your AI Readiness Score
@@ -116,18 +98,16 @@ export default function AssessmentResult({ result, onDownload, onRestart }) {
                 </div>
             </div>
 
-            {/* MAIN RESULT CARD */}
+            {/* MAIN RESULT */}
             <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] gap-8 items-start">
 
                 {/* Score Card */}
                 <div
                     className={`rounded-xl border p-8 flex flex-col items-center justify-center text-center shadow-sm ${borderColor}`}
                 >
-                    <div className={`text-6xl font-extrabold mb-2 ${scoreColor}`}>
-                        {parsedScore !== null ? `${parsedScore}%` : "—"}
-                    </div>
+                    <ScoreDonut score={parsedScore} />
 
-                    <div className="text-lg font-semibold text-brand-dark uppercase tracking-widest">
+                    <div className="mt-4 text-lg font-semibold text-brand-dark uppercase tracking-widest">
                         {category}
                     </div>
                 </div>
@@ -142,7 +122,6 @@ export default function AssessmentResult({ result, onDownload, onRestart }) {
                         {renderNarrative(narrative)}
                     </div>
                 </div>
-
             </div>
 
             {/* NEXT STEPS */}
@@ -152,29 +131,29 @@ export default function AssessmentResult({ result, onDownload, onRestart }) {
                 </h3>
 
                 <p className="text-brand-gray mb-6 max-w-2xl mx-auto">
-                    A detailed PDF report has been generated for you with specific functional
+                    A detailed PDF report has been generated with functional
                     recommendations and an implementation roadmap.
                 </p>
-
-                <div className="mb-6">
+                <div className="mb-6"> 
                     <button
-                        className="inline-flex items-center justify-center px-10 py-3 text-base font-semibold rounded-md text-white bg-brand-gradient hover:opacity-90 shadow-md transition-all hover:scale-[1.02]"
+                        className="px-8 py-3 font-medium rounded-md text-white bg-brand-gradient hover:opacity-90 shadow-sm"
                     >
-                        Book Consulting
+                        Get in Touch
                     </button>
+
                 </div>
 
                 <div className="flex flex-col sm:flex-row justify-center gap-4">
                     <button
                         onClick={() => onDownload(id)}
-                        className="inline-flex items-center justify-center px-8 py-3 text-base font-medium rounded-md text-white bg-brand-gradient hover:opacity-90 shadow-sm transition-all hover:shadow-md"
+                        className="px-8 py-3 font-medium rounded-md text-white bg-brand-gradient hover:opacity-90 shadow-sm"
                     >
                         Download Full Report
                     </button>
 
                     <button
                         onClick={onRestart}
-                        className="inline-flex items-center justify-center px-8 py-3 text-base font-medium rounded-md text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 shadow-sm transition-all"
+                        className="px-8 py-3 font-medium rounded-md text-gray-700 bg-white border hover:bg-gray-50"
                     >
                         Start New Assessment
                     </button>
