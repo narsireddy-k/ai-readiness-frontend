@@ -1,16 +1,234 @@
-# React + Vite
+# AI Readiness Frontend (React Application)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This repository contains the **frontend application** for the **AI Readiness Assessment Platform**. It is a **React-based SPA** that guides users through an AI readiness questionnaire, validates responses, visualizes scores, and displays final assessment results.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Features
 
-## React Compiler
+- Multi-step AI readiness assessment flow
+- Dynamic question rendering
+- Progress tracking with visual indicators
+- Score visualization (donut charts & sliders)
+- Consistency and validation warnings
+- Result summary with readiness level
+- Backend API integration
+- Clean, modular component architecture
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🧱 Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Framework:** React (Vite / CRA compatible)
+- **Language:** JavaScript (JSX)
+- **Styling:** CSS (App.css)
+- **Charts:** Custom SVG / chart components
+- **API Communication:**  Axios abstraction
+- **State Management:** React Hooks
+
+---
+
+## 📁 Project Structure
+
+```
+ai-readiness-frontend/
+└── src/
+    ├── api/
+    │   └── aiReadiness.js        # Backend API calls
+    │
+    ├── assets/
+    │   ├── logo.png
+    │   └── react.svg
+    │
+    ├── components/              # Reusable UI components
+    │   ├── AssessmentForm.jsx
+    │   ├── AssessmentPreview.jsx
+    │   ├── AssessmentResult.jsx
+    │   ├── ConsistencyWarningModal.jsx
+    │   ├── ProgressBar.jsx
+    │   ├── QuestionCard.jsx
+    │   ├── ReadinessSlider.jsx
+    │   ├── ScoreDonut.jsx
+    │   ├── UserDetailsForm.jsx
+    │   └── WarningModal.jsx
+    │
+    ├── config/                  # App configuration
+    ├── pages/                   # Page-level components
+    ├── utils/                   # Utility functions
+    │
+    ├── App.css                  # Global styles
+    └── App.jsx                  # Root component
+```
+
+---
+
+## ⚙️ Setup Instructions (Local Development)
+
+### 1️⃣ Clone the Repository
+
+```bash
+git clone https://github.com/<your-org>/ai-readiness-frontend.git
+cd ai-readiness-frontend
+```
+
+---
+
+### 2️⃣ Install Dependencies
+
+```bash
+npm install
+# or
+yarn install
+```
+
+---
+
+### 3️⃣ Environment Configuration
+
+Create a `.env` file in the root directory:
+
+```env
+VITE_API_BASE_URL=http://127.0.0.1:8000
+```
+
+> Update the URL based on backend deployment
+
+---
+
+### 4️⃣ Run Development Server
+
+```bash
+npm run dev
+# or
+yarn dev
+```
+
+Frontend will be available at:
+
+```
+http://localhost:5173
+```
+
+---
+
+## 🔗 Backend Integration
+
+All backend API calls are centralized in:
+
+```
+src/api/aiReadiness.js
+```
+
+Example responsibilities:
+
+- Start assessment
+- Submit answers
+- Fetch score & readiness level
+- Trigger email delivery
+
+This abstraction keeps components clean and maintainable.
+
+---
+
+## 🧠 Application Flow
+
+1. **User Details Form**
+2. **Assessment Questionnaire**
+3. **Live Progress Tracking**
+4. **Consistency Validation**
+5. **Score Calculation (via backend)**
+6. **Result Visualization**
+
+---
+
+## 📊 Visualization Components
+
+- **ProgressBar** – Question completion status
+- **ScoreDonut** – Overall readiness score
+- **ReadinessSlider** – Maturity positioning
+
+These components are reusable and backend-agnostic.
+
+---
+
+## ⚠️ Validation & Warnings
+
+- Inconsistent answers trigger warnings
+- Mandatory fields enforced
+- Modal-based user confirmations
+
+Handled via:
+
+```
+ConsistencyWarningModal.jsx
+WarningModal.jsx
+```
+
+---
+
+## 🔐 Security Considerations
+
+- No secrets committed to repo
+- Backend URL managed via env variables
+- Stateless frontend
+
+> Authentication (if added later) should use JWT / OAuth
+
+---
+
+## 🚢 Production Build
+
+```bash
+npm run build
+```
+
+Output directory:
+
+```
+dist/
+```
+
+Deployable on:
+
+- Vercel
+- Netlify
+- AWS S3 + CloudFront
+- Azure Static Web Apps
+
+---
+
+## 🧪 Testing (Optional)
+
+```bash
+npm run test
+```
+
+(Add Jest / RTL if required)
+
+---
+
+## 🤝 Contribution Guidelines
+
+1. Create feature branch
+2. Use reusable components
+3. Follow consistent naming
+4. Open Pull Request
+
+---
+
+## 📜 License
+
+This project is proprietary and intended for internal or client use.
+
+---
+
+## 📞 Support
+
+For frontend issues, UI changes, or enhancements, contact the frontend team or raise a GitHub Issue.
+
+---
+
+### ✅ Maintained by
+
+**ForgeByte AI – Frontend Team**
+
