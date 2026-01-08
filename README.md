@@ -230,5 +230,5 @@ For frontend issues, UI changes, or enhancements, contact the frontend team or r
 
 ### ✅ Maintained by
 
-**ForgeByte AI – Frontend Team**
+**ForgeByte AI**
 
